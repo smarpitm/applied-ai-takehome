@@ -96,36 +96,34 @@ def compute_weighted_score(verdict: PointwiseVerdict) -> float:
 
 def _pointwise_schema_skeleton() -> str:
     crit = {
-        "quoted_evidence": ["<exact quote from candidate output>"],
-        "rationale": "<verify facts/constraints first BEFORE picking score>",
-        "score": "<int 1-5>",
+        "quoted_evidence": ["<short 3-8 word quote>"],
+        "rationale": "<max 12 word verification before score>",
+        "score": 5,
     }
     return json.dumps(
         {
             "criteria": {name: crit for name in RUBRIC_WEIGHTS},
-            "overall_rationale": "<summary judgment grounded in evidence above>",
-            "overall_score": "<float 1.0-5.0>",
-            "passed": "<bool>",
-        },
-        indent=2,
+            "overall_rationale": "<1-sentence summary>",
+            "overall_score": 5.0,
+            "passed": True,
+        }
     )
 
 
 def _pairwise_schema_skeleton() -> str:
     crit = {
-        "quoted_evidence_a": ["<exact quote from Candidate A>"],
-        "quoted_evidence_b": ["<exact quote from Candidate B>"],
-        "rationale": "<compare factual accuracy, constraints, conciseness BEFORE scores>",
-        "score_a": "<int 1-5>",
-        "score_b": "<int 1-5>",
+        "quoted_evidence_a": ["<short quote A>"],
+        "quoted_evidence_b": ["<short quote B>"],
+        "rationale": "<max 12 word comparison before scores>",
+        "score_a": 5,
+        "score_b": 3,
     }
     return json.dumps(
         {
             "criteria": {name: crit for name in RUBRIC_WEIGHTS},
-            "overall_rationale": "<overall comparison grounded in criterion evidence>",
-            "winner": "A | B | tie",
-        },
-        indent=2,
+            "overall_rationale": "<1-sentence comparison>",
+            "winner": "A",
+        }
     )
 
 
@@ -237,7 +235,7 @@ def build_pairwise_prompt(
         f"{ref_section}"
         f"--- Candidate A ---\n{first_text or ''}\n\n"
         f"--- Candidate B ---\n{second_text or ''}\n\n"
-        f"Required JSON Schema (Winner refers to Candidate A vs Candidate B shown above):\n"
+        "Required JSON Schema (score_a/score_b integers 1-5; winner is A, B, or tie):\n"
         f"{_pairwise_schema_skeleton()}"
     )
     return RenderedPrompt(system_prompt=sys_msg, user_prompt=user_msg, template_type=template_type)

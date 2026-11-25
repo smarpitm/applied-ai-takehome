@@ -193,7 +193,9 @@ def run_all(
         precomputed_base_outcomes=adv_base_out,
         precomputed_mit_outcomes=adv_mit_out,
     )
-    retest = run_test_retest_validation(engine, main_cases, repeats=3)
+    retest = run_test_retest_validation(
+        engine, main_cases, repeats=3, precomputed_run1_outcomes=mit_pt[1]
+    )
     ab_rep = run_ab_comparison(
         ab_data, engine=engine, generate_live=generate_live_ab, settings=settings
     )

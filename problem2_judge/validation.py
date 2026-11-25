@@ -159,13 +159,20 @@ def run_test_retest_validation(
     cases: list[TestCase],
     repeats: int = 3,
     run_id: str | None = None,
+    precomputed_run1_outcomes: list[Any] | None = None,
 ) -> dict[str, Any]:
     """Re-run judge N=3 times at temperature=0.0 and measure verdict consistency."""
     rid = run_id or uuid.uuid4().hex[:8]
     subset = cases[:10]
     runs_verdicts: list[list[bool | None]] = []
 
-    for idx in range(repeats):
+    start_idx = 0
+    if precomputed_run1_outcomes is not None and len(precomputed_run1_outcomes) >= len(subset):
+        run1 = precomputed_run1_outcomes[: len(subset)]
+        runs_verdicts.append([o.verdict.passed if o.verdict else None for o in run1])
+        start_idx = 1
+
+    for idx in range(start_idx, repeats):
         _, outcomes = engine.run_pointwise_suite(
             subset, suite_name=f"retest_{idx + 1}", mitigated=True, run_id=f"{rid}_rt{idx + 1}"
         )
