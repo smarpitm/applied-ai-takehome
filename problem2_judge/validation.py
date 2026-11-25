@@ -31,15 +31,24 @@ def run_gold_agreement_validation(
     engine: JudgeEngine,
     cases: list[TestCase],
     run_id: str | None = None,
+    precomputed_pw_outcomes: list[Any] | None = None,
+    precomputed_ab_results: list[Any] | None = None,
 ) -> dict[str, Any]:
     """Measure raw agreement and Cohen's kappa against hand-labeled gold verdicts."""
     rid = run_id or uuid.uuid4().hex[:8]
 
     # Pointwise pass/fail agreement
     pw_cases = [c for c in cases if c.gold_pass is not None and c.model_output is not None]
-    _, pw_outcomes = engine.run_pointwise_suite(
-        pw_cases, suite_name="gold_pointwise", mitigated=True, run_id=f"{rid}_gold_pw"
-    )
+    if precomputed_pw_outcomes is not None and len(precomputed_pw_outcomes) == len(cases):
+        pw_outcomes = [
+            o
+            for c, o in zip(cases, precomputed_pw_outcomes, strict=True)
+            if c.gold_pass is not None and c.model_output is not None
+        ]
+    else:
+        _, pw_outcomes = engine.run_pointwise_suite(
+            pw_cases, suite_name="gold_pointwise", mitigated=True, run_id=f"{rid}_gold_pw"
+        )
     pw_true: list[bool] = []
     pw_pred: list[bool] = []
     for case, out in zip(pw_cases, pw_outcomes, strict=True):
@@ -60,13 +69,20 @@ def run_gold_agreement_validation(
 
     # Pairwise winner agreement
     ab_cases = [c for c in cases if c.gold_winner is not None and c.output_a and c.output_b]
-    _, ab_results = engine.run_pairwise_suite(
-        ab_cases,
-        suite_name="gold_pairwise",
-        mitigated=True,
-        swap_orders=True,
-        run_id=f"{rid}_gold_ab",
-    )
+    if precomputed_ab_results is not None and len(precomputed_ab_results) == len(cases):
+        ab_results = [
+            r
+            for c, r in zip(cases, precomputed_ab_results, strict=True)
+            if c.gold_winner is not None and c.output_a and c.output_b
+        ]
+    else:
+        _, ab_results = engine.run_pairwise_suite(
+            ab_cases,
+            suite_name="gold_pairwise",
+            mitigated=True,
+            swap_orders=True,
+            run_id=f"{rid}_gold_ab",
+        )
     ab_true = [c.gold_winner for c in ab_cases if c.gold_winner is not None]
     ab_pred = [r.reconciled_winner for r in ab_results]
     ab_acc = (
@@ -90,15 +106,23 @@ def run_adversarial_probe_validation(
     engine: JudgeEngine,
     probes: list[TestCase],
     run_id: str | None = None,
+    precomputed_base_outcomes: list[Any] | None = None,
+    precomputed_mit_outcomes: list[Any] | None = None,
 ) -> dict[str, Any]:
     """Run all targeted adversarial probes on naive baseline vs mitigated judge."""
     rid = run_id or uuid.uuid4().hex[:8]
-    _, base_outcomes = engine.run_pointwise_suite(
-        probes, suite_name="adv_baseline", mitigated=False, run_id=f"{rid}_adv_base"
-    )
-    _, mit_outcomes = engine.run_pointwise_suite(
-        probes, suite_name="adv_mitigated", mitigated=True, run_id=f"{rid}_adv_mit"
-    )
+    if precomputed_base_outcomes is not None:
+        base_outcomes = precomputed_base_outcomes
+    else:
+        _, base_outcomes = engine.run_pointwise_suite(
+            probes, suite_name="adv_baseline", mitigated=False, run_id=f"{rid}_adv_base"
+        )
+    if precomputed_mit_outcomes is not None:
+        mit_outcomes = precomputed_mit_outcomes
+    else:
+        _, mit_outcomes = engine.run_pointwise_suite(
+            probes, suite_name="adv_mitigated", mitigated=True, run_id=f"{rid}_adv_mit"
+        )
 
     def _fooled_stats(outcomes: list[Any]) -> tuple[int, float, dict[str, dict[str, int]]]:
         fooled_total = 0

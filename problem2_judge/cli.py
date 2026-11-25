@@ -158,14 +158,41 @@ def run_all(
     ab_data = _load_yaml_or_json(Path("problem2_judge/data/ab_configs/ab_suite.yaml"))
 
     engine = JudgeEngine(settings=settings)
+
+    # Pre-compute shared runs once at temperature=0 to eliminate redundant GPU calls
+    mit_pt = engine.run_pointwise_suite(main_cases, suite_name="main_pointwise", mitigated=True)
+    mit_ab = engine.run_pairwise_suite(
+        main_cases, suite_name="main_pairwise", mitigated=True, swap_orders=True
+    )
+    _, adv_base_out = engine.run_pointwise_suite(
+        probe_cases, suite_name="adv_baseline", mitigated=False
+    )
+    _, adv_mit_out = engine.run_pointwise_suite(
+        probe_cases, suite_name="adv_mitigated", mitigated=True
+    )
+
     bias_rep = run_all_bias_experiments(
         main_cases=main_cases,
         verbosity_pairs=verb_data["pairs"],
         probes=probe_cases,
         settings=settings,
+        mit_pairwise=mit_ab,
+        mit_pointwise=mit_pt,
+        adv_base_outcomes=adv_base_out,
+        adv_mit_outcomes=adv_mit_out,
     )
-    gold = run_gold_agreement_validation(engine, main_cases)
-    adv = run_adversarial_probe_validation(engine, probe_cases)
+    gold = run_gold_agreement_validation(
+        engine,
+        main_cases,
+        precomputed_pw_outcomes=mit_pt[1],
+        precomputed_ab_results=mit_ab[1],
+    )
+    adv = run_adversarial_probe_validation(
+        engine,
+        probe_cases,
+        precomputed_base_outcomes=adv_base_out,
+        precomputed_mit_outcomes=adv_mit_out,
+    )
     retest = run_test_retest_validation(engine, main_cases, repeats=3)
     ab_rep = run_ab_comparison(
         ab_data, engine=engine, generate_live=generate_live_ab, settings=settings

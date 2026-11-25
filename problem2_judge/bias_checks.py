@@ -30,6 +30,7 @@ def run_position_bias_experiment(
     engine: JudgeEngine,
     cases: list[TestCase],
     run_id: str,
+    mit_pairwise: tuple[Any, list[Any]] | None = None,
 ) -> dict[str, Any]:
     """Compare raw AB/BA flip rate before reconciliation vs reconciled tie handling."""
     base_report, _ = engine.run_pairwise_suite(
@@ -39,13 +40,16 @@ def run_position_bias_experiment(
         swap_orders=True,
         run_id=f"{run_id}_pos_base",
     )
-    mit_report, mit_results = engine.run_pairwise_suite(
-        cases,
-        suite_name="position_mitigated",
-        mitigated=True,
-        swap_orders=True,
-        run_id=f"{run_id}_pos_mit",
-    )
+    if mit_pairwise is not None:
+        mit_report, mit_results = mit_pairwise
+    else:
+        mit_report, mit_results = engine.run_pairwise_suite(
+            cases,
+            suite_name="position_mitigated",
+            mitigated=True,
+            swap_orders=True,
+            run_id=f"{run_id}_pos_mit",
+        )
     inconsistent_ties = sum(1 for r in mit_results if r.position_flipped)
     return {
         "baseline_raw_flip_rate": base_report.position_flip_rate,
@@ -123,6 +127,7 @@ def run_self_enhancement_experiment(
     cases: list[TestCase],
     audit_log_path: Path,
     run_id: str,
+    precomputed_cross_results: list[Any] | None = None,
 ) -> dict[str, Any]:
     """Compare same-family judge vs cross-family judge win-rate on Llama vs non-Llama pairs."""
     gen_cfg = settings.p2_generator_config()
@@ -157,13 +162,20 @@ def run_self_enhancement_experiment(
         swap_orders=True,
         run_id=f"{run_id}_se_same",
     )
-    cross_rep, _ = cross_engine.run_pairwise_suite(
-        subset,
-        suite_name="self_enh_cross",
-        mitigated=True,
-        swap_orders=True,
-        run_id=f"{run_id}_se_cross",
-    )
+    if precomputed_cross_results is not None and len(precomputed_cross_results) >= len(subset):
+        cross_slice = precomputed_cross_results[: len(subset)]
+        cross_wins_a = sum(1 for r in cross_slice if r.reconciled_winner == "A")
+        cross_mean_b = round(statistics.mean(r.mean_score_b for r in cross_slice), 4)
+    else:
+        cross_rep, _ = cross_engine.run_pairwise_suite(
+            subset,
+            suite_name="self_enh_cross",
+            mitigated=True,
+            swap_orders=True,
+            run_id=f"{run_id}_se_cross",
+        )
+        cross_wins_a = cross_rep.wins_a
+        cross_mean_b = cross_rep.mean_overall_score
     n = len(subset) or 1
     active_gen_model = (
         gen_cfg.fallback_model
@@ -176,9 +188,9 @@ def run_self_enhancement_experiment(
         "cross_family_judge_model": judge_cfg.model,
         "cross_family_fallback_model": judge_cfg.fallback_model,
         "same_family_win_rate_a": round(same_rep.wins_a / n, 4),
-        "cross_family_win_rate_a": round(cross_rep.wins_a / n, 4),
+        "cross_family_win_rate_a": round(cross_wins_a / n, 4),
         "same_family_mean_score_b": same_rep.mean_overall_score,
-        "cross_family_mean_score_b": cross_rep.mean_overall_score,
+        "cross_family_mean_score_b": cross_mean_b,
     }
 
 
@@ -186,6 +198,8 @@ def run_sycophancy_experiment(
     engine: JudgeEngine,
     probes: list[TestCase],
     run_id: str,
+    precomputed_base_out: list[Any] | None = None,
+    precomputed_mit_out: list[Any] | None = None,
 ) -> dict[str, Any]:
     """Measure false-pass rate on confidently-wrong / sycophancy probes before vs after."""
     wrong_cats = {
@@ -193,13 +207,28 @@ def run_sycophancy_experiment(
         "verbose_but_wrong",
         "polite_instruction_violation",
     }
-    syco_probes = [p for p in probes if p.category in wrong_cats]
-    _, base_out = engine.run_pointwise_suite(
-        syco_probes, suite_name="sycophancy_baseline", mitigated=False, run_id=f"{run_id}_syco_base"
-    )
-    _, mit_out = engine.run_pointwise_suite(
-        syco_probes, suite_name="sycophancy_mitigated", mitigated=True, run_id=f"{run_id}_syco_mit"
-    )
+    if precomputed_base_out is not None and precomputed_mit_out is not None:
+        base_out = [
+            o for p, o in zip(probes, precomputed_base_out, strict=True) if p.category in wrong_cats
+        ]
+        mit_out = [
+            o for p, o in zip(probes, precomputed_mit_out, strict=True) if p.category in wrong_cats
+        ]
+        syco_probes = [p for p in probes if p.category in wrong_cats]
+    else:
+        syco_probes = [p for p in probes if p.category in wrong_cats]
+        _, base_out = engine.run_pointwise_suite(
+            syco_probes,
+            suite_name="sycophancy_baseline",
+            mitigated=False,
+            run_id=f"{run_id}_syco_base",
+        )
+        _, mit_out = engine.run_pointwise_suite(
+            syco_probes,
+            suite_name="sycophancy_mitigated",
+            mitigated=True,
+            run_id=f"{run_id}_syco_mit",
+        )
 
     n = len(syco_probes) or 1
     base_fp = sum(1 for o in base_out if o.verdict and o.verdict.passed)
@@ -215,14 +244,18 @@ def run_score_clustering_experiment(
     engine: JudgeEngine,
     cases: list[TestCase],
     run_id: str,
+    mit_pointwise_report: Any | None = None,
 ) -> dict[str, Any]:
     """Measure pointwise score std-dev and 1-5 spread before vs after 1/3/5 anchors."""
     base_rep, _ = engine.run_pointwise_suite(
         cases, suite_name="clustering_baseline", mitigated=False, run_id=f"{run_id}_clust_base"
     )
-    mit_rep, _ = engine.run_pointwise_suite(
-        cases, suite_name="clustering_mitigated", mitigated=True, run_id=f"{run_id}_clust_mit"
-    )
+    if mit_pointwise_report is not None:
+        mit_rep = mit_pointwise_report
+    else:
+        mit_rep, _ = engine.run_pointwise_suite(
+            cases, suite_name="clustering_mitigated", mitigated=True, run_id=f"{run_id}_clust_mit"
+        )
     return {
         "total_cases": len(cases),
         "baseline_score_std_dev": base_rep.score_std_dev,
@@ -239,6 +272,10 @@ def run_all_bias_experiments(
     router: LLMRouter | None = None,
     settings: Settings | None = None,
     audit_log_path: Path | None = None,
+    mit_pairwise: tuple[Any, list[Any]] | None = None,
+    mit_pointwise: tuple[Any, list[Any]] | None = None,
+    adv_base_outcomes: list[Any] | None = None,
+    adv_mit_outcomes: list[Any] | None = None,
 ) -> dict[str, Any]:
     """Execute controlled before-vs-after experiments across all 5 bias categories."""
     cfg = settings or get_settings()
@@ -247,11 +284,29 @@ def run_all_bias_experiments(
     engine = JudgeEngine(router=llm, settings=cfg, audit_log_path=log_path)
     run_id = uuid.uuid4().hex[:8]
 
-    pos = run_position_bias_experiment(engine, main_cases, run_id)
+    pos = run_position_bias_experiment(engine, main_cases, run_id, mit_pairwise=mit_pairwise)
     verb = run_verbosity_bias_experiment(engine, verbosity_pairs, run_id)
-    se = run_self_enhancement_experiment(llm, cfg, main_cases, log_path, run_id)
-    syco = run_sycophancy_experiment(engine, probes, run_id)
-    clust = run_score_clustering_experiment(engine, main_cases, run_id)
+    se = run_self_enhancement_experiment(
+        llm,
+        cfg,
+        main_cases,
+        log_path,
+        run_id,
+        precomputed_cross_results=mit_pairwise[1] if mit_pairwise else None,
+    )
+    syco = run_sycophancy_experiment(
+        engine,
+        probes,
+        run_id,
+        precomputed_base_out=adv_base_outcomes,
+        precomputed_mit_out=adv_mit_outcomes,
+    )
+    clust = run_score_clustering_experiment(
+        engine,
+        main_cases,
+        run_id,
+        mit_pointwise_report=mit_pointwise[0] if mit_pointwise else None,
+    )
 
     summary_rows = [
         BiasSummaryRow(
