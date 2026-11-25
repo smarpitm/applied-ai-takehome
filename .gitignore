@@ -32,5 +32,6 @@ Thumbs.db
 .vscode/
 .idea/
 
-# Local uncommitted user checklist / guide
+# Local uncommitted user checklist / guide & HR submission draft
 USER_GUIDE_EVENING.md
+submissions/

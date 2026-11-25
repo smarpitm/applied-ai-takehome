@@ -35,7 +35,7 @@ class QdrantVectorStore:
 
         if url:
             try:
-                client = QdrantClient(url=url, timeout=2.0)
+                client = QdrantClient(url=url, timeout=2.0, check_compatibility=False)
                 client.get_collections()
                 self.client = client
                 self.mode_label = "docker_memmap_int8"
@@ -188,6 +188,10 @@ class QdrantVectorStore:
                 )
             )
         return hits, latency_ms
+
+    def close(self) -> None:
+        """Close Qdrant client handles cleanly (releases Windows .lock files)."""
+        self.client.close()
 
     def stats(self) -> dict[str, Any]:
         return {

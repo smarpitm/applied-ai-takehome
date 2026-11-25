@@ -182,7 +182,7 @@ def run_chunking_ablation(
 
     results: list[dict[str, Any]] = []
     for c_size, c_overlap in configs:
-        with tempfile.TemporaryDirectory() as tmp:
+        with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
             store = LanceVectorStore(
                 db_path=Path(tmp) / "lance",
                 embedding_dim=embedder.dim,
@@ -247,7 +247,7 @@ def run_scale_latency_benchmark(
         return [x / norm for x in raw]
 
     queries = [_rand_vec() for _ in range(num_queries)]
-    with tempfile.TemporaryDirectory() as tmp:
+    with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
         tmp_path = Path(tmp)
         lance = LanceVectorStore(db_path=tmp_path / "lance_10k", embedding_dim=dim)
         tbl = lance._get_or_create_table()
@@ -315,6 +315,8 @@ def run_scale_latency_benchmark(
         for qv in queries[:20]:
             _, ms = qdrant.search(qv, k=5, filters={"topic": "security"})
             q_lat.append(ms)
+        q_mode = qdrant.mode_label
+        qdrant.close()
 
         return {
             "synthetic_vector_count": num_vectors,
@@ -325,7 +327,7 @@ def run_scale_latency_benchmark(
             "lancedb_ivfpq_cold_first_ms": ivfpq_lat[0] if ivfpq_lat else 0.0,
             "lancedb_ivfpq_p50_ms": _percentile(ivfpq_lat, 50),
             "lancedb_ivfpq_p95_ms": _percentile(ivfpq_lat, 95),
-            "qdrant_1k_mode": qdrant.mode_label,
+            "qdrant_1k_mode": q_mode,
             "qdrant_1k_p50_ms": _percentile(q_lat, 50),
             "qdrant_1k_p95_ms": _percentile(q_lat, 95),
         }
@@ -352,7 +354,7 @@ def run_full_evaluation(
     first_ingest = svc.ingest_directory(corpus_dir, sync_qdrant=sync_qdrant)
     second_ingest = svc.ingest_directory(corpus_dir, sync_qdrant=sync_qdrant)
 
-    # 2. Evaluate all 24 questions
+    # 2a. Run all 24 RAG queries first (batches generator model loading on local GPU)
     per_question_rows: list[dict[str, Any]] = []
     ir_list: list[dict[str, float]] = []
     faith_scores: list[int] = []
@@ -367,6 +369,7 @@ def run_full_evaluation(
     unanswerable_refused = 0
     judge_model_used = "none"
 
+    query_records: list[tuple[dict[str, Any], Any]] = []
     for q in questions:
         is_unans = bool(q.get("unanswerable", False))
         q_filters = q.get("filters")
@@ -386,7 +389,12 @@ def run_full_evaluation(
                     k=k,
                 )
             )
+        query_records.append((q, res))
 
+    # 2b. Score all answerable outputs with separate strict-JSON judge model
+    for q, res in query_records:
+        is_unans = bool(q.get("unanswerable", False))
+        q_filters = q.get("filters")
         if is_unans:
             unanswerable_total += 1
             if res.no_context:

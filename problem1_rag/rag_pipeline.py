@@ -64,8 +64,8 @@ class RAGQueryResult:
 
 
 def extract_inline_citations(answer_text: str) -> list[str]:
-    """Extract bracketed chunk IDs cited inline by the LLM."""
-    matches = re.findall(r"\[([A-Za-z0-9_.-]+__c\d{3}__[a-f0-9]+)\]", answer_text)
+    """Extract chunk IDs cited inline by the LLM (bracketed or bare chunk IDs)."""
+    matches = re.findall(r"([A-Za-z0-9_.-]+__c\d{3}__[a-f0-9]{10})", answer_text)
     seen: list[str] = []
     for m in matches:
         if m not in seen:
@@ -250,10 +250,10 @@ class RAGService:
                 "role": "system",
                 "content": (
                     "You are a precise engineering QA assistant. Answer ONLY using the retrieved "
-                    "context chunks below. Cite exact chunk IDs inline in square brackets like "
-                    "[chunk_id] for every factual claim. If the context does not contain the "
-                    "answer, state clearly that the provided context does not state it."
-                ),
+                    "context chunks below. Always cite the exact chunk_id in square brackets like "
+                    "[{chunk_id}] for every factual sentence (for example, [{example_id}]). "
+                    "If the context does not contain the answer, state that it is not stated."
+                ).replace("{example_id}", passing_hits[0].chunk_id),
             },
             {
                 "role": "user",
@@ -261,7 +261,7 @@ class RAGService:
                     "Retrieved Context:\n"
                     + "\n\n".join(context_lines)
                     + f"\n\nQuestion: {question}\n\n"
-                    + "Answer concisely with inline [chunk_id] citations:"
+                    + "Answer concisely and include exact [chunk_id] citations:"
                 ),
             },
         ]

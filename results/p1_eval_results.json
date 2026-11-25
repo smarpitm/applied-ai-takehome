@@ -1,0 +1,615 @@
+{
+  "k": 5,
+  "total_questions": 24,
+  "answerable_questions": 20,
+  "unanswerable_questions": 4,
+  "idempotency_check": {
+    "first_ingest": {
+      "files_scanned": 12,
+      "files_inserted": 12,
+      "files_updated": 0,
+      "files_skipped_unchanged": 0,
+      "chunks_processed": 13,
+      "lancedb_vector_count": 13,
+      "qdrant_vector_count": 13,
+      "elapsed_ms": 5828.64
+    },
+    "second_ingest": {
+      "files_scanned": 12,
+      "files_inserted": 0,
+      "files_updated": 0,
+      "files_skipped_unchanged": 12,
+      "chunks_processed": 13,
+      "lancedb_vector_count": 13,
+      "qdrant_vector_count": 13,
+      "elapsed_ms": 901.55
+    },
+    "zero_duplicate_vectors": true
+  },
+  "retrieval_metrics": {
+    "recall_at_k": 1.0,
+    "hit_rate_at_k": 1.0,
+    "mrr": 0.95,
+    "ndcg_at_k": 0.9631,
+    "context_precision": 0.5492
+  },
+  "answer_quality": {
+    "judge_model_used": "qwen2.5:3b",
+    "mean_faithfulness_1_to_5": 5,
+    "mean_relevance_1_to_5": 5,
+    "mean_em": 0.0,
+    "mean_f1": 0.4563,
+    "no_context_refusal_accuracy": 1.0,
+    "unanswerable_refused": 4
+  },
+  "latency_ms": {
+    "corpus_retrieval_p50_ms": 15.07,
+    "corpus_retrieval_p95_ms": 24.77,
+    "corpus_e2e_p50_ms": 4054.87,
+    "corpus_e2e_p95_ms": 5499.22
+  },
+  "qdrant_bonus_comparison": {
+    "enabled": true,
+    "mode": "local_disk_fallback",
+    "recall_at_k": 1.0,
+    "mrr": 0.95,
+    "retrieval_p50_ms": 0.66,
+    "retrieval_p95_ms": 1.46
+  },
+  "chunking_ablation": [
+    {
+      "chunk_size_tokens": 256,
+      "chunk_overlap_tokens": 32,
+      "total_chunks": 17,
+      "recall_at_k": 1.0,
+      "mrr": 0.9417,
+      "ndcg_at_k": 0.9565,
+      "context_precision": 0.2492
+    },
+    {
+      "chunk_size_tokens": 512,
+      "chunk_overlap_tokens": 64,
+      "total_chunks": 13,
+      "recall_at_k": 1.0,
+      "mrr": 0.975,
+      "ndcg_at_k": 0.9815,
+      "context_precision": 0.2717
+    },
+    {
+      "chunk_size_tokens": 1024,
+      "chunk_overlap_tokens": 128,
+      "total_chunks": 12,
+      "recall_at_k": 1.0,
+      "mrr": 0.95,
+      "ndcg_at_k": 0.9631,
+      "context_precision": 0.2683
+    }
+  ],
+  "scale_latency_benchmark": {
+    "synthetic_vector_count": 10000,
+    "queries_tested": 30,
+    "lancedb_flat_p50_ms": 27.36,
+    "lancedb_flat_p95_ms": 34.55,
+    "lancedb_ivfpq_index_build_s": 1.48,
+    "lancedb_ivfpq_cold_first_ms": 83.71,
+    "lancedb_ivfpq_p50_ms": 18.46,
+    "lancedb_ivfpq_p95_ms": 23.06,
+    "qdrant_1k_mode": "local_disk_fallback",
+    "qdrant_1k_p50_ms": 12.45,
+    "qdrant_1k_p95_ms": 13.09
+  },
+  "per_question": [
+    {
+      "id": "q01",
+      "unanswerable": false,
+      "filters": null,
+      "ir_metrics": {
+        "recall_at_k": 1.0,
+        "hit_rate": 1.0,
+        "mrr": 1.0,
+        "ndcg_at_k": 1.0,
+        "context_precision": 0.2
+      },
+      "em": 0.0,
+      "f1": 0.4571,
+      "faithfulness_score": 5,
+      "relevance_score": 5,
+      "valid_citations": [
+        "vector_storage_overview__c000__6c2571e8e6"
+      ],
+      "retrieval_latency_ms": 15.07,
+      "total_latency_ms": 12468.89,
+      "provider_used": "ollama",
+      "model_used": "llama3.1:latest"
+    },
+    {
+      "id": "q02",
+      "unanswerable": false,
+      "filters": {
+        "topic": "architecture"
+      },
+      "ir_metrics": {
+        "recall_at_k": 1.0,
+        "hit_rate": 1.0,
+        "mrr": 1.0,
+        "ndcg_at_k": 1.0,
+        "context_precision": 0.25
+      },
+      "em": 0.0,
+      "f1": 0.6977,
+      "faithfulness_score": 5,
+      "relevance_score": 5,
+      "valid_citations": [
+        "vector_storage_overview__c000__6c2571e8e6"
+      ],
+      "retrieval_latency_ms": 38.33,
+      "total_latency_ms": 4677.72,
+      "provider_used": "ollama",
+      "model_used": "llama3.1:latest"
+    },
+    {
+      "id": "q03",
+      "unanswerable": false,
+      "filters": {
+        "file_type": "md"
+      },
+      "ir_metrics": {
+        "recall_at_k": 1.0,
+        "hit_rate": 1.0,
+        "mrr": 0.5,
+        "ndcg_at_k": 0.6309,
+        "context_precision": 0.3333
+      },
+      "em": 0.0,
+      "f1": 0.3077,
+      "faithfulness_score": 5,
+      "relevance_score": 5,
+      "valid_citations": [
+        "vector_storage_overview__c000__6c2571e8e6"
+      ],
+      "retrieval_latency_ms": 15.55,
+      "total_latency_ms": 4323.97,
+      "provider_used": "ollama",
+      "model_used": "llama3.1:latest"
+    },
+    {
+      "id": "q04",
+      "unanswerable": false,
+      "filters": null,
+      "ir_metrics": {
+        "recall_at_k": 1.0,
+        "hit_rate": 1.0,
+        "mrr": 1.0,
+        "ndcg_at_k": 1.0,
+        "context_precision": 0.2
+      },
+      "em": 0.0,
+      "f1": 0.481,
+      "faithfulness_score": 5,
+      "relevance_score": 5,
+      "valid_citations": [
+        "vector_storage_overview__c001__259b65e083"
+      ],
+      "retrieval_latency_ms": 14.44,
+      "total_latency_ms": 5499.22,
+      "provider_used": "ollama",
+      "model_used": "llama3.1:latest"
+    },
+    {
+      "id": "q05",
+      "unanswerable": false,
+      "filters": {
+        "file_type": "html"
+      },
+      "ir_metrics": {
+        "recall_at_k": 1.0,
+        "hit_rate": 1.0,
+        "mrr": 1.0,
+        "ndcg_at_k": 1.0,
+        "context_precision": 0.3333
+      },
+      "em": 0.0,
+      "f1": 0.375,
+      "faithfulness_score": 5,
+      "relevance_score": 5,
+      "valid_citations": [
+        "hybrid_query_routing__c000__34559a0a0d"
+      ],
+      "retrieval_latency_ms": 14.93,
+      "total_latency_ms": 4054.87,
+      "provider_used": "ollama",
+      "model_used": "llama3.1:latest"
+    },
+    {
+      "id": "q06",
+      "unanswerable": false,
+      "filters": null,
+      "ir_metrics": {
+        "recall_at_k": 1.0,
+        "hit_rate": 1.0,
+        "mrr": 1.0,
+        "ndcg_at_k": 1.0,
+        "context_precision": 1.0
+      },
+      "em": 0.0,
+      "f1": 0.2326,
+      "faithfulness_score": 5,
+      "relevance_score": 5,
+      "valid_citations": [],
+      "retrieval_latency_ms": 14.41,
+      "total_latency_ms": 3259.28,
+      "provider_used": "ollama",
+      "model_used": "llama3.1:latest"
+    },
+    {
+      "id": "q07",
+      "unanswerable": false,
+      "filters": {
+        "file_type": "pdf"
+      },
+      "ir_metrics": {
+        "recall_at_k": 1.0,
+        "hit_rate": 1.0,
+        "mrr": 1.0,
+        "ndcg_at_k": 1.0,
+        "context_precision": 1.0
+      },
+      "em": 0.0,
+      "f1": 0.5424,
+      "faithfulness_score": 5,
+      "relevance_score": 5,
+      "valid_citations": [
+        "cost_benchmark_whitepaper__c000__ed3a034233"
+      ],
+      "retrieval_latency_ms": 17.13,
+      "total_latency_ms": 4378.66,
+      "provider_used": "ollama",
+      "model_used": "llama3.1:latest"
+    },
+    {
+      "id": "q08",
+      "unanswerable": false,
+      "filters": {
+        "topic": "security"
+      },
+      "ir_metrics": {
+        "recall_at_k": 1.0,
+        "hit_rate": 1.0,
+        "mrr": 1.0,
+        "ndcg_at_k": 1.0,
+        "context_precision": 1.0
+      },
+      "em": 0.0,
+      "f1": 0.3243,
+      "faithfulness_score": 5,
+      "relevance_score": 5,
+      "valid_citations": [
+        "iam_zero_trust__c000__c5e8e48745"
+      ],
+      "retrieval_latency_ms": 15.1,
+      "total_latency_ms": 3936.68,
+      "provider_used": "ollama",
+      "model_used": "llama3.1:latest"
+    },
+    {
+      "id": "q09",
+      "unanswerable": false,
+      "filters": {
+        "topic": "security"
+      },
+      "ir_metrics": {
+        "recall_at_k": 1.0,
+        "hit_rate": 1.0,
+        "mrr": 1.0,
+        "ndcg_at_k": 1.0,
+        "context_precision": 0.5
+      },
+      "em": 0.0,
+      "f1": 0.6667,
+      "faithfulness_score": 5,
+      "relevance_score": 5,
+      "valid_citations": [],
+      "retrieval_latency_ms": 24.77,
+      "total_latency_ms": 3489.51,
+      "provider_used": "ollama",
+      "model_used": "llama3.1:latest"
+    },
+    {
+      "id": "q10",
+      "unanswerable": false,
+      "filters": null,
+      "ir_metrics": {
+        "recall_at_k": 1.0,
+        "hit_rate": 1.0,
+        "mrr": 1.0,
+        "ndcg_at_k": 1.0,
+        "context_precision": 1.0
+      },
+      "em": 0.0,
+      "f1": 0.3256,
+      "faithfulness_score": 5,
+      "relevance_score": 5,
+      "valid_citations": [],
+      "retrieval_latency_ms": 14.21,
+      "total_latency_ms": 3327.65,
+      "provider_used": "ollama",
+      "model_used": "llama3.1:latest"
+    },
+    {
+      "id": "q11",
+      "unanswerable": false,
+      "filters": {
+        "topic": "security"
+      },
+      "ir_metrics": {
+        "recall_at_k": 1.0,
+        "hit_rate": 1.0,
+        "mrr": 1.0,
+        "ndcg_at_k": 1.0,
+        "context_precision": 0.5
+      },
+      "em": 0.0,
+      "f1": 0.5926,
+      "faithfulness_score": 5,
+      "relevance_score": 5,
+      "valid_citations": [
+        "secret_management_guide__c000__5379c15431"
+      ],
+      "retrieval_latency_ms": 15.88,
+      "total_latency_ms": 3919.92,
+      "provider_used": "ollama",
+      "model_used": "llama3.1:latest"
+    },
+    {
+      "id": "q12",
+      "unanswerable": false,
+      "filters": {
+        "file_type": "pdf"
+      },
+      "ir_metrics": {
+        "recall_at_k": 1.0,
+        "hit_rate": 1.0,
+        "mrr": 0.5,
+        "ndcg_at_k": 0.6309,
+        "context_precision": 0.5
+      },
+      "em": 0.0,
+      "f1": 0.1818,
+      "faithfulness_score": 5,
+      "relevance_score": 5,
+      "valid_citations": [
+        "pii_redaction_pipeline__c000__0301f5244e"
+      ],
+      "retrieval_latency_ms": 15.91,
+      "total_latency_ms": 3228.76,
+      "provider_used": "ollama",
+      "model_used": "llama3.1:latest"
+    },
+    {
+      "id": "q13",
+      "unanswerable": false,
+      "filters": {
+        "topic": "operations"
+      },
+      "ir_metrics": {
+        "recall_at_k": 1.0,
+        "hit_rate": 1.0,
+        "mrr": 1.0,
+        "ndcg_at_k": 1.0,
+        "context_precision": 0.5
+      },
+      "em": 0.0,
+      "f1": 0.5882,
+      "faithfulness_score": 5,
+      "relevance_score": 5,
+      "valid_citations": [
+        "slo_error_budgets__c000__1fc8ac7559"
+      ],
+      "retrieval_latency_ms": 14.47,
+      "total_latency_ms": 4783.63,
+      "provider_used": "ollama",
+      "model_used": "llama3.1:latest"
+    },
+    {
+      "id": "q14",
+      "unanswerable": false,
+      "filters": null,
+      "ir_metrics": {
+        "recall_at_k": 1.0,
+        "hit_rate": 1.0,
+        "mrr": 1.0,
+        "ndcg_at_k": 1.0,
+        "context_precision": 1.0
+      },
+      "em": 0.0,
+      "f1": 0.3226,
+      "faithfulness_score": 5,
+      "relevance_score": 5,
+      "valid_citations": [],
+      "retrieval_latency_ms": 17.08,
+      "total_latency_ms": 3820.64,
+      "provider_used": "ollama",
+      "model_used": "llama3.1:latest"
+    },
+    {
+      "id": "q15",
+      "unanswerable": false,
+      "filters": {
+        "topic": "operations"
+      },
+      "ir_metrics": {
+        "recall_at_k": 1.0,
+        "hit_rate": 1.0,
+        "mrr": 1.0,
+        "ndcg_at_k": 1.0,
+        "context_precision": 0.5
+      },
+      "em": 0.0,
+      "f1": 0.5484,
+      "faithfulness_score": 5,
+      "relevance_score": 5,
+      "valid_citations": [
+        "cold_start_mitigation__c000__230aac8010"
+      ],
+      "retrieval_latency_ms": 18.68,
+      "total_latency_ms": 4240.2,
+      "provider_used": "ollama",
+      "model_used": "llama3.1:latest"
+    },
+    {
+      "id": "q16",
+      "unanswerable": false,
+      "filters": {
+        "file_type": "pdf"
+      },
+      "ir_metrics": {
+        "recall_at_k": 1.0,
+        "hit_rate": 1.0,
+        "mrr": 1.0,
+        "ndcg_at_k": 1.0,
+        "context_precision": 0.5
+      },
+      "em": 0.0,
+      "f1": 0.5385,
+      "faithfulness_score": 5,
+      "relevance_score": 5,
+      "valid_citations": [
+        "backup_and_disaster_recovery__c000__61da212bd1"
+      ],
+      "retrieval_latency_ms": 15.96,
+      "total_latency_ms": 5302.15,
+      "provider_used": "ollama",
+      "model_used": "llama3.1:latest"
+    },
+    {
+      "id": "q17",
+      "unanswerable": false,
+      "filters": {
+        "topic": "api_reference"
+      },
+      "ir_metrics": {
+        "recall_at_k": 1.0,
+        "hit_rate": 1.0,
+        "mrr": 1.0,
+        "ndcg_at_k": 1.0,
+        "context_precision": 0.3333
+      },
+      "em": 0.0,
+      "f1": 0.4444,
+      "faithfulness_score": 5,
+      "relevance_score": 5,
+      "valid_citations": [
+        "idempotency_and_retries__c000__55b5a9f230"
+      ],
+      "retrieval_latency_ms": 14.3,
+      "total_latency_ms": 4410.24,
+      "provider_used": "ollama",
+      "model_used": "llama3.1:latest"
+    },
+    {
+      "id": "q18",
+      "unanswerable": false,
+      "filters": null,
+      "ir_metrics": {
+        "recall_at_k": 1.0,
+        "hit_rate": 1.0,
+        "mrr": 1.0,
+        "ndcg_at_k": 1.0,
+        "context_precision": 0.5
+      },
+      "em": 0.0,
+      "f1": 0.6957,
+      "faithfulness_score": 5,
+      "relevance_score": 5,
+      "valid_citations": [
+        "idempotency_and_retries__c000__55b5a9f230"
+      ],
+      "retrieval_latency_ms": 16.09,
+      "total_latency_ms": 4124.03,
+      "provider_used": "ollama",
+      "model_used": "llama3.1:latest"
+    },
+    {
+      "id": "q19",
+      "unanswerable": false,
+      "filters": {
+        "file_type": "html"
+      },
+      "ir_metrics": {
+        "recall_at_k": 1.0,
+        "hit_rate": 1.0,
+        "mrr": 1.0,
+        "ndcg_at_k": 1.0,
+        "context_precision": 0.5
+      },
+      "em": 0.0,
+      "f1": 0.3721,
+      "faithfulness_score": 5,
+      "relevance_score": 5,
+      "valid_citations": [
+        "pagination_and_quotas__c000__0b6a96cd7d"
+      ],
+      "retrieval_latency_ms": 15.61,
+      "total_latency_ms": 5334.34,
+      "provider_used": "ollama",
+      "model_used": "llama3.1:latest"
+    },
+    {
+      "id": "q20",
+      "unanswerable": false,
+      "filters": {
+        "topic": "api_reference"
+      },
+      "ir_metrics": {
+        "recall_at_k": 1.0,
+        "hit_rate": 1.0,
+        "mrr": 1.0,
+        "ndcg_at_k": 1.0,
+        "context_precision": 0.3333
+      },
+      "em": 0.0,
+      "f1": 0.4324,
+      "faithfulness_score": 5,
+      "relevance_score": 5,
+      "valid_citations": [
+        "ingestion_webhook_spec__c000__4c5e574522"
+      ],
+      "retrieval_latency_ms": 14.38,
+      "total_latency_ms": 5079.64,
+      "provider_used": "ollama",
+      "model_used": "llama3.1:latest"
+    },
+    {
+      "id": "q21",
+      "unanswerable": true,
+      "no_context_triggered": true,
+      "retrieval_latency_ms": 14.71,
+      "total_latency_ms": 22.51,
+      "top_score": 0.5647
+    },
+    {
+      "id": "q22",
+      "unanswerable": true,
+      "no_context_triggered": true,
+      "retrieval_latency_ms": 13.61,
+      "total_latency_ms": 22.4,
+      "top_score": 0.6502
+    },
+    {
+      "id": "q23",
+      "unanswerable": true,
+      "no_context_triggered": true,
+      "retrieval_latency_ms": 14.65,
+      "total_latency_ms": 23.96,
+      "top_score": 0.6453
+    },
+    {
+      "id": "q24",
+      "unanswerable": true,
+      "no_context_triggered": true,
+      "retrieval_latency_ms": 14.34,
+      "total_latency_ms": 22.75,
+      "top_score": 0.539
+    }
+  ]
+}
