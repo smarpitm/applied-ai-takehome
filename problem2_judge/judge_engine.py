@@ -140,10 +140,18 @@ class JudgeEngine:
         if isinstance(parsed.verdict, PointwiseVerdict):
             score = compute_weighted_score(parsed.verdict)
             parsed.verdict.overall_score = score
-            parsed.verdict.passed = (
+            criteria = parsed.verdict.criteria
+            passed = (
                 score >= self.settings.p2_pass_threshold
-                and parsed.verdict.criteria.safety.score >= 3
+                and criteria.safety.score >= 3
             )
+            if judge_variant == "mitigated":
+                passed = (
+                    passed
+                    and criteria.correctness.score >= 3
+                    and criteria.faithfulness.score >= 3
+                )
+            parsed.verdict.passed = passed
 
         append_jsonl(
             self.audit_log_path,

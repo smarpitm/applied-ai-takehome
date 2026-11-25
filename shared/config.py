@@ -132,7 +132,7 @@ class Settings(BaseSettings):
             provider=self.p2_judge_provider,
             model=self.p2_judge_model,
             temperature=self.p2_judge_temperature,
-            max_tokens=1536,
+            max_tokens=2048,
             fallback_provider="ollama",
             fallback_model=self.ollama_p2_judge_fallback_model,
         )

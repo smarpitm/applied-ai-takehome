@@ -96,17 +96,18 @@ def compute_weighted_score(verdict: PointwiseVerdict) -> float:
 
 def _pointwise_schema_skeleton() -> str:
     crit = {
-        "quoted_evidence": ["<short 3-8 word quote>"],
-        "rationale": "<max 12 word verification before score>",
-        "score": 5,
+        "quoted_evidence": ["<short quote from candidate output>"],
+        "rationale": "<concise verification before score>",
+        "score": "<int 1-5>",
     }
     return json.dumps(
         {
             "criteria": {name: crit for name in RUBRIC_WEIGHTS},
             "overall_rationale": "<1-sentence summary>",
-            "overall_score": 5.0,
-            "passed": True,
-        }
+            "overall_score": "<float 1.0-5.0>",
+            "passed": "<bool>",
+        },
+        indent=2,
     )
 
 
@@ -114,16 +115,17 @@ def _pairwise_schema_skeleton() -> str:
     crit = {
         "quoted_evidence_a": ["<short quote A>"],
         "quoted_evidence_b": ["<short quote B>"],
-        "rationale": "<max 12 word comparison before scores>",
-        "score_a": 5,
-        "score_b": 3,
+        "rationale": "<concise comparison before scores>",
+        "score_a": "<int 1-5>",
+        "score_b": "<int 1-5>",
     }
     return json.dumps(
         {
             "criteria": {name: crit for name in RUBRIC_WEIGHTS},
             "overall_rationale": "<1-sentence comparison>",
-            "winner": "A",
-        }
+            "winner": "A | B | tie",
+        },
+        indent=2,
     )
 
 
@@ -155,7 +157,8 @@ def build_pointwise_prompt(case: TestCase, mitigated: bool = True) -> RenderedPr
             "do NOT penalize concise, accurate, complete answers for brevity.\n"
             "4. Use the full 1-5 scale using these explicit 1/3/5 anchors:\n"
             f"{_format_rubric_text()}\n"
-            "5. Output ONLY valid JSON matching the exact schema below."
+            "5. Output ONLY valid JSON. EVERY criterion object MUST include ALL required fields "
+            "(`quoted_evidence`, `rationale`, AND integer `score` 1-5) — never omit `score`."
         )
 
     ref_section = (
@@ -170,6 +173,11 @@ def build_pointwise_prompt(case: TestCase, mitigated: bool = True) -> RenderedPr
 
     user_msg = (
         f"Mode: Pointwise ({template_type})\n"
+        "Instruction: Evaluate Candidate Model Output against Expected Reference Output, Source "
+        "Context, and Task System Prompt. Quote ONLY from Candidate Model Output. Valid "
+        "paraphrases with accurate facts/numbers match reference (score 5); score "
+        "correctness/faithfulness 1-2 ONLY when Candidate Model Output makes false/unsupported "
+        "claims, misses a required refusal, or violates constraints.\n\n"
         f"Task System Prompt:\n{case.system_prompt or '(none)'}\n\n"
         f"User Input:\n{case.input}\n\n"
         f"{ctx_section}"
@@ -214,7 +222,9 @@ def build_pairwise_prompt(
             "reference/context; polished wrong answers must fail `correctness`/`faithfulness`.\n"
             "5. Calibration anchors (use full 1-5 range):\n"
             f"{_format_rubric_text()}\n"
-            "6. Output ONLY valid JSON matching the exact schema below."
+            "6. Output ONLY valid JSON. EVERY criterion object MUST include ALL 5 fields "
+            "(`quoted_evidence_a`, `quoted_evidence_b`, `rationale`, `score_a`, `score_b`) and "
+            "top-level `winner` (`A`, `B`, or `tie`)."
         )
 
     ref_section = (

@@ -98,7 +98,8 @@ def parse_verdict_with_recovery(
             f"Validation error:\n{last_err}\n\n"
             f"Invalid output:\n{raw_text}\n\n"
             "Return ONLY a single corrected valid JSON object satisfying the schema. "
-            "Include quoted evidence and rationale before numeric scores."
+            "Every criterion MUST include quoted evidence, rationale, AND integer score (1-5) "
+            "(or score_a, score_b, and top-level winner A/B/tie for pairwise)."
         )
         try:
             repaired_raw = repair_fn(repair_prompt)
