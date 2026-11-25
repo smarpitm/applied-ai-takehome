@@ -31,3 +31,6 @@ Thumbs.db
 *.swp
 .vscode/
 .idea/
+
+# Local uncommitted user checklist / guide
+USER_GUIDE_EVENING.md
