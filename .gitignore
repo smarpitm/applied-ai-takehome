@@ -1,0 +1,33 @@
+# Python environments & caches
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.eggs/
+build/
+dist/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# Environment variables & secrets (keep .env.example tracked)
+.env
+.env.*
+!.env.example
+
+# Local vector stores, databases, and runtime logs
+data/
+*.lance/
+*.db
+*.sqlite
+*.sqlite3
+results/logs/*.jsonl
+
+# OS & editor artifacts
+.DS_Store
+Thumbs.db
+*.swp
+.vscode/
+.idea/

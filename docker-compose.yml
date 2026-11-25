@@ -1,0 +1,13 @@
+services:
+  qdrant:
+    image: qdrant/qdrant:v1.12.5
+    container_name: applied-ai-qdrant
+    ports:
+      - "6333:6333"
+      - "6334:6334"
+    environment:
+      # Keep payloads on disk via memmap for low-RAM comparison against LanceDB
+      QDRANT__STORAGE__ON_DISK_PAYLOAD: "true"
+    volumes:
+      - ./data/qdrant_docker:/qdrant/storage
+    restart: unless-stopped
