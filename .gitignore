@@ -17,8 +17,8 @@ dist/
 .env.*
 !.env.example
 
-# Local vector stores, databases, and runtime logs
-data/
+# Local runtime vector stores, databases, and runtime logs
+/data/
 *.lance/
 *.db
 *.sqlite

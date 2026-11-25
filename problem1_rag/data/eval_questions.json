@@ -1,0 +1,242 @@
+[
+  {
+    "id": "q01",
+    "question": "How many bytes does one uncompressed 384-dimensional vector occupy in NimbusStack and which local model generates it?",
+    "relevant_chunk_ids": ["vector_storage_overview__c000__6c2571e8e6"],
+    "relevant_sources": ["architecture/vector_storage_overview.md"],
+    "answer_keywords": ["1,536 bytes", "bge-small-en-v1.5"],
+    "filters": null,
+    "gold_answer": "1,536 bytes uncompressed generated locally by BAAI/bge-small-en-v1.5.",
+    "unanswerable": false
+  },
+  {
+    "id": "q02",
+    "question": "What IVF-PQ partition count, subvector count, and compressed byte size per vector does NimbusStack configure?",
+    "relevant_chunk_ids": ["vector_storage_overview__c000__6c2571e8e6"],
+    "relevant_sources": ["architecture/vector_storage_overview.md"],
+    "answer_keywords": ["256 partitions", "48 subvectors", "48 bytes"],
+    "filters": {"topic": "architecture"},
+    "gold_answer": "256 partitions and 48 subvectors (8 bits per code), compressing each vector to 48 bytes.",
+    "unanswerable": false
+  },
+  {
+    "id": "q03",
+    "question": "How does NimbusStack guarantee zero duplicate vectors when a modified file shrinks in chunk count?",
+    "relevant_chunk_ids": ["vector_storage_overview__c001__259b65e083"],
+    "relevant_sources": ["architecture/vector_storage_overview.md"],
+    "answer_keywords": ["doc_hash", "merge_insert"],
+    "filters": {"file_type": "md"},
+    "gold_answer": "It detects the changed doc_hash, deletes prior rows for source_id, and runs LanceDB merge_insert keyed on chunk_id.",
+    "unanswerable": false
+  },
+  {
+    "id": "q04",
+    "question": "At what QPS, latency SLA, or mutation rate should teams migrate back from embedded LanceDB to a managed vector DB?",
+    "relevant_chunk_ids": ["vector_storage_overview__c001__259b65e083"],
+    "relevant_sources": ["architecture/vector_storage_overview.md"],
+    "answer_keywords": ["50 QPS", "sub-20 ms", "1,000"],
+    "filters": null,
+    "gold_answer": "Above 50 QPS with sub-20 ms p99 SLAs, sub-100 ms active-active multi-region writes, or >1,000 vector mutations/sec.",
+    "unanswerable": false
+  },
+  {
+    "id": "q05",
+    "question": "Why does NimbusStack push metadata predicates into LanceDB before vector scoring rather than post-filtering?",
+    "relevant_chunk_ids": ["hybrid_query_routing__c000__34559a0a0d"],
+    "relevant_sources": ["architecture/hybrid_query_routing.html"],
+    "answer_keywords": ["top-k starvation", "5%"],
+    "filters": {"file_type": "html"},
+    "gold_answer": "Pre-filtering avoids wasted distance work and prevents top-k starvation when selective filters match under 5% of rows.",
+    "unanswerable": false
+  },
+  {
+    "id": "q06",
+    "question": "What cosine similarity threshold gates the no-context refusal branch before invoking the LLM?",
+    "relevant_chunk_ids": ["hybrid_query_routing__c000__34559a0a0d"],
+    "relevant_sources": ["architecture/hybrid_query_routing.html"],
+    "answer_keywords": ["0.665", "zero generation tokens"],
+    "filters": null,
+    "gold_answer": "A calibrated cosine similarity threshold of 0.665; queries below 0.665 terminate with a refusal and zero generation tokens.",
+    "unanswerable": false
+  },
+  {
+    "id": "q07",
+    "question": "What is the approximate monthly cost of LanceDB S3 storage plus a t4g.small node for 10 million 384-dim PQ vectors?",
+    "relevant_chunk_ids": ["cost_benchmark_whitepaper__c000__ed3a034233"],
+    "relevant_sources": ["architecture/cost_benchmark_whitepaper.pdf"],
+    "answer_keywords": ["480 MB", "$0.10", "$18/month"],
+    "filters": {"file_type": "pdf"},
+    "gold_answer": "Under $0.10/month in S3 storage (480 MB PQ vectors + ~3.2 GB chunks) and roughly $18/month on a t4g.small compute node.",
+    "unanswerable": false
+  },
+  {
+    "id": "q08",
+    "question": "What are the TTL and automatic rotation interval for internal SPIFFE mTLS certificates?",
+    "relevant_chunk_ids": ["iam_zero_trust__c000__c5e8e48745"],
+    "relevant_sources": ["security/iam_zero_trust.md"],
+    "answer_keywords": ["24-hour", "12 hours"],
+    "filters": {"topic": "security"},
+    "gold_answer": "X.509 certificates have a strict 24-hour TTL and rotate automatically at 12 hours.",
+    "unanswerable": false
+  },
+  {
+    "id": "q09",
+    "question": "How long are hot authorization audit logs kept vs. S3 Glacier Deep Archive logs?",
+    "relevant_chunk_ids": ["iam_zero_trust__c000__c5e8e48745"],
+    "relevant_sources": ["security/iam_zero_trust.md"],
+    "answer_keywords": ["90 days", "7 years"],
+    "filters": {"topic": "security"},
+    "gold_answer": "Hot audit logs stay searchable for 90 days and are archived in S3 Glacier Deep Archive for 7 years.",
+    "unanswerable": false
+  },
+  {
+    "id": "q10",
+    "question": "What quorum and duration govern break-glass emergency access during identity issuer outages?",
+    "relevant_chunk_ids": ["iam_zero_trust__c000__c5e8e48745"],
+    "relevant_sources": ["security/iam_zero_trust.md"],
+    "answer_keywords": ["two senior SREs", "60-minute"],
+    "filters": null,
+    "gold_answer": "Two senior SREs must jointly approve via hardware YubiKey quorum to mint a 60-minute break-glass role.",
+    "unanswerable": false
+  },
+  {
+    "id": "q11",
+    "question": "Which encryption cipher wraps tenant payloads and how frequently do AWS KMS CMKs rotate?",
+    "relevant_chunk_ids": ["secret_management_guide__c000__5379c15431"],
+    "relevant_sources": ["security/secret_management_guide.html"],
+    "answer_keywords": ["AES-256-GCM", "365 days"],
+    "filters": {"topic": "security"},
+    "gold_answer": "AES-256-GCM DEKs wrapped by AWS KMS CMKs rotated every 365 days.",
+    "unanswerable": false
+  },
+  {
+    "id": "q12",
+    "question": "Within how many hours does NimbusStack purge historical snapshots under GDPR Article 17 tenant deletion?",
+    "relevant_chunk_ids": ["pii_redaction_pipeline__c000__0301f5244e"],
+    "relevant_sources": ["security/pii_redaction_pipeline.pdf"],
+    "answer_keywords": ["72 hours", "GDPR Article 17"],
+    "filters": {"file_type": "pdf"},
+    "gold_answer": "Immediate predicate delete on active tables and historical time-travel snapshot purge within 72 hours.",
+    "unanswerable": false
+  },
+  {
+    "id": "q13",
+    "question": "What are the Query API monthly availability SLO and warm vs. cold p95 retrieval latency targets?",
+    "relevant_chunk_ids": ["slo_error_budgets__c000__1fc8ac7559"],
+    "relevant_sources": ["operations/slo_error_budgets.md"],
+    "answer_keywords": ["99.95%", "45 ms", "220 ms"],
+    "filters": {"topic": "operations"},
+    "gold_answer": "99.95% availability SLO; warm retrieval p95 target is 45 ms (p50 18 ms) and cold object-store ceiling is 220 ms p95.",
+    "unanswerable": false
+  },
+  {
+    "id": "q14",
+    "question": "What 5xx error rate or error budget burn triggers an automated canary rollback vs. deployment freeze?",
+    "relevant_chunk_ids": ["slo_error_budgets__c000__1fc8ac7559"],
+    "relevant_sources": ["operations/slo_error_budgets.md"],
+    "answer_keywords": ["5%", "0.5%", "3 consecutive minutes"],
+    "filters": null,
+    "gold_answer": "Deployments freeze above 5% burn in 6 hours; canary rollbacks trigger if 5xx exceeds 0.5% for 3 consecutive minutes or p95 > 350 ms.",
+    "unanswerable": false
+  },
+  {
+    "id": "q15",
+    "question": "How large is the worker NVMe read-through cache and what thresholds trigger nightly Lance compaction?",
+    "relevant_chunk_ids": ["cold_start_mitigation__c000__230aac8010"],
+    "relevant_sources": ["operations/cold_start_mitigation.html"],
+    "answer_keywords": ["8 GB", "50 deletes", "16 delta files"],
+    "filters": {"topic": "operations"},
+    "gold_answer": "8 GB NVMe read-through cache; nightly compaction merges fragments exceeding 50 deletes or 16 delta files into 256 MB segments.",
+    "unanswerable": false
+  },
+  {
+    "id": "q16",
+    "question": "What are the RPO, RTO, and quarterly restore drill frequency for cross-region S3 replication?",
+    "relevant_chunk_ids": ["backup_and_disaster_recovery__c000__61da212bd1"],
+    "relevant_sources": ["operations/backup_and_disaster_recovery.pdf"],
+    "answer_keywords": ["15 minutes", "30 minutes", "90 days"],
+    "filters": {"file_type": "pdf"},
+    "gold_answer": "RPO is 15 minutes, RTO is under 30 minutes, and automated restore drills run every 90 days.",
+    "unanswerable": false
+  },
+  {
+    "id": "q17",
+    "question": "How long are Idempotency-Key headers valid and what HTTP status code returns on body hash mismatch?",
+    "relevant_chunk_ids": ["idempotency_and_retries__c000__55b5a9f230"],
+    "relevant_sources": ["api_reference/idempotency_and_retries.md"],
+    "answer_keywords": ["24 hours", "HTTP 409"],
+    "filters": {"topic": "api_reference"},
+    "gold_answer": "Idempotency keys remain valid for 24 hours and mismatching body hashes return HTTP 409 Conflict.",
+    "unanswerable": false
+  },
+  {
+    "id": "q18",
+    "question": "What exponential backoff base delay, maximum delay cap, and max attempts apply when Retry-After is absent?",
+    "relevant_chunk_ids": ["idempotency_and_retries__c000__55b5a9f230"],
+    "relevant_sources": ["api_reference/idempotency_and_retries.md"],
+    "answer_keywords": ["250 ms", "16 seconds", "5 attempts"],
+    "filters": null,
+    "gold_answer": "250 ms base delay capped at 16 seconds across at most 5 attempts with full random jitter.",
+    "unanswerable": false
+  },
+  {
+    "id": "q19",
+    "question": "What are the cursor pagination page limits and free-tier vs. standard-tier token bucket rate limits?",
+    "relevant_chunk_ids": ["pagination_and_quotas__c000__0b6a96cd7d"],
+    "relevant_sources": ["api_reference/pagination_and_quotas.html"],
+    "answer_keywords": ["50 items", "200 items", "30 queries per minute", "600 queries per minute"],
+    "filters": {"file_type": "html"},
+    "gold_answer": "Default 50 items (max 200 items); free tier gets 30 queries/min (burst 10) and standard tier gets 600 queries/min.",
+    "unanswerable": false
+  },
+  {
+    "id": "q20",
+    "question": "How are ingestion webhook signatures computed, what is the replay window, and what is the sync POST /ingest size limit?",
+    "relevant_chunk_ids": ["ingestion_webhook_spec__c000__4c5e574522"],
+    "relevant_sources": ["api_reference/ingestion_webhook_spec.pdf"],
+    "answer_keywords": ["HMAC-SHA256", "300 seconds", "50 files", "25 MB"],
+    "filters": {"topic": "api_reference"},
+    "gold_answer": "HMAC-SHA256 over timestamp + '.' + raw_request_body rejecting >300s old signatures; sync POST /ingest caps at 50 files or 25 MB.",
+    "unanswerable": false
+  },
+  {
+    "id": "q21",
+    "question": "What was NimbusStack's Q3 2024 GAAP net revenue and headcount in Tokyo?",
+    "relevant_chunk_ids": [],
+    "relevant_sources": [],
+    "answer_keywords": [],
+    "filters": null,
+    "gold_answer": "Unanswerable from indexed corpus.",
+    "unanswerable": true
+  },
+  {
+    "id": "q22",
+    "question": "How do you configure Azure AKS Terraform modules for NimbusStack GPU autoscaling?",
+    "relevant_chunk_ids": [],
+    "relevant_sources": [],
+    "answer_keywords": [],
+    "filters": null,
+    "gold_answer": "Unanswerable from indexed corpus.",
+    "unanswerable": true
+  },
+  {
+    "id": "q23",
+    "question": "Which PostgreSQL pgvector HNSW ef_construction setting does Stripe use for billing invoices?",
+    "relevant_chunk_ids": [],
+    "relevant_sources": [],
+    "answer_keywords": [],
+    "filters": null,
+    "gold_answer": "Unanswerable from indexed corpus.",
+    "unanswerable": true
+  },
+  {
+    "id": "q24",
+    "question": "What is today's cafeteria lunch menu and Wi-Fi password at the London office?",
+    "relevant_chunk_ids": [],
+    "relevant_sources": [],
+    "answer_keywords": [],
+    "filters": null,
+    "gold_answer": "Unanswerable from indexed corpus.",
+    "unanswerable": true
+  }
+]

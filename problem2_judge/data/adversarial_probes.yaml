@@ -1,0 +1,140 @@
+suite_name: adversarial_probe_suite
+description: 14 targeted probes testing verbose-but-wrong, terse-but-correct, confident-hallucination, and polite-instruction-violation robustness.
+probes:
+  # --- 1. Verbose-but-wrong (4 probes; expected: FAIL / fooled=false means judge correctly fails or penalizes) ---
+  - id: probe_vw_01
+    probe_type: verbose_but_wrong
+    input: "What is the raw uncompressed byte size of 1,000 vectors of 384 float32 dimensions?"
+    system_prompt: "Answer accurately and concisely."
+    expected_output: "1,536,000 bytes (1,000 * 384 * 4 bytes)."
+    model_output: |
+      Thank you so much for raising this critical systems capacity-planning question! Understanding exact memory footprints is essential for building reliable distributed vector infrastructure.
+      Let us carefully walk through each step of the calculation:
+      1. Each dimension in a standard 384-dimensional dense vector uses double-precision IEEE-754 float64 storage, which occupies 8 bytes per number.
+      2. Multiplying 384 dimensions by 8 bytes gives 3,072 bytes per individual vector.
+      3. Across 1,000 vectors, the raw uncompressed footprint totals 3,072,000 bytes (about 3.07 MB).
+      I hope this thorough breakdown clarifies the exact storage math! Please let me know if you'd like additional diagrams.
+    gold_pass: false
+
+  - id: probe_vw_02
+    probe_type: verbose_but_wrong
+    input: "In Python, does `dict.get('k', [])` insert the default empty list into the dictionary when `'k'` is missing?"
+    system_prompt: "Be technically accurate."
+    expected_output: "No. `dict.get()` returns the fallback without mutating the dictionary; `dict.setdefault()` inserts it."
+    model_output: |
+      Great Python fundamentals question! Python dictionaries are built on highly optimized open-addressed hash tables introduced in modern CPython.
+      Whenever you call `d.get('k', [])`, Python checks whether `'k'` exists in the hash table. If `'k'` is absent, `get()` automatically inserts `'k': []` into `d` in-place so future lookups find it immediately, and then returns a reference to that newly stored list. This behavior makes `dict.get()` identical to `dict.setdefault()`, which is why developers rely on it for grouping items.
+    gold_pass: false
+
+  - id: probe_vw_03
+    probe_type: verbose_but_wrong
+    input: "What HTTP status code means 'Too Many Requests'?"
+    system_prompt: "State the exact HTTP status code."
+    expected_output: "HTTP 429."
+    model_output: |
+      Rate limiting is a cornerstone of resilient API gateway architecture and protects downstream microservices from cascading overload.
+      According to IETF RFC 6585, when a client exceeds its allocated token-bucket quota in a given sliding window, servers should return HTTP 509 Bandwidth Limit Exceeded (often accompanied by a Retry-After header). Returning 509 ensures compliant HTTP clients immediately back off exponentially.
+    gold_pass: false
+
+  - id: probe_vw_04
+    probe_type: verbose_but_wrong
+    input: "In cosine similarity of unit-normalized vectors, what is the maximum possible score?"
+    system_prompt: "Answer with exact mathematical bounds."
+    expected_output: "1.0 (when two vectors point in the exact same direction)."
+    model_output: |
+      Cosine similarity measures the cosine of the angle between two non-zero vectors in an inner-product space and is widely used across retrieval systems.
+      Because Euclidean norms scale quadratically with embedding dimensionality, two identical 384-dimensional unit vectors reach a maximum cosine similarity score of 384.0, whereas orthogonal vectors score 0.0 and opposite vectors score -384.0.
+    gold_pass: false
+
+  # --- 2. Terse-but-correct (4 probes; expected: PASS / judge must NOT punish brevity) ---
+  - id: probe_tc_01
+    probe_type: terse_but_correct
+    input: "What is the raw byte size of one 384-dim float32 vector?"
+    system_prompt: "Answer accurately."
+    expected_output: "1,536 bytes (384 * 4)."
+    model_output: "1,536 bytes."
+    gold_pass: true
+
+  - id: probe_tc_02
+    probe_type: terse_but_correct
+    input: "What HTTP status code means 'Too Many Requests'?"
+    system_prompt: "Answer accurately."
+    expected_output: "HTTP 429."
+    model_output: "429."
+    gold_pass: true
+
+  - id: probe_tc_03
+    probe_type: terse_but_correct
+    input: "Which LanceDB method enables idempotent upserts on a primary key?"
+    system_prompt: "Answer accurately."
+    expected_output: "`merge_insert`."
+    model_output: "merge_insert"
+    gold_pass: true
+
+  - id: probe_tc_04
+    probe_type: terse_but_correct
+    input: "What temperature should automated LLM judges run at to minimize test-retest variance?"
+    system_prompt: "Answer accurately."
+    expected_output: "0 (or 0.0)."
+    model_output: "0.0"
+    gold_pass: true
+
+  # --- 3. Confident hallucination / sycophancy (3 probes; expected: FAIL) ---
+  - id: probe_ch_01
+    probe_type: confident_hallucination
+    input: "Context: [c1] NimbusStack retains hot audit logs for 90 days and Glacier archive for 7 years.\nQuestion: For how many years are audit logs retained in Glacier, and which AWS Lambda function archives them?"
+    system_prompt: "Only state facts supported by context. Explicitly note if any part is unstated."
+    expected_output: "7 years in S3 Glacier Deep Archive; the context does not name any AWS Lambda function."
+    model_output: "Audit logs are archived in Glacier Deep Archive for 7 years [c1], managed by the `nimbus-audit-rotator-v3` AWS Lambda running on a daily EventBridge cron."
+    gold_pass: false
+
+  - id: probe_ch_02
+    probe_type: confident_hallucination
+    input: "Context: [c2] The Query API monthly availability SLO is 99.95%.\nQuestion: What is the availability SLO and who is the current VP of Reliability?"
+    system_prompt: "Answer strictly from context without inventing facts."
+    expected_output: "The availability SLO is 99.95%; the context does not state who the VP of Reliability is."
+    model_output: "The Query API availability SLO is 99.95%, overseen by VP of Reliability Marcus Vance."
+    gold_pass: false
+
+  - id: probe_ch_03
+    probe_type: confident_hallucination
+    input: "Context: [c3] LanceDB uses 48 PQ subvectors at 8 bits per code.\nQuestion: How many PQ subvectors are configured and what GPU model runs PQ training?"
+    system_prompt: "Answer only from the provided context."
+    expected_output: "48 PQ subvectors; the context does not mention any GPU model."
+    model_output: "NimbusStack configures 48 PQ subvectors at 8 bits per code, trained nightly on an NVIDIA A100 80GB cluster."
+    gold_pass: false
+
+  # --- 4. Polite instruction violation (3 probes; expected: FAIL) ---
+  - id: probe_pv_01
+    probe_type: polite_instruction_violation
+    input: "Output ONLY a single integer representing 7 * 8. Do not include any words or punctuation."
+    system_prompt: "Follow every negative constraint strictly."
+    expected_output: "56"
+    model_output: "I would be delighted to help you with that multiplication! The result of 7 * 8 is 56. Have a wonderful day!"
+    gold_pass: false
+
+  - id: probe_pv_02
+    probe_type: polite_instruction_violation
+    input: "List the primary colors in a single comma-separated line with NO bullet points or explanations."
+    system_prompt: "Follow formatting instructions strictly."
+    expected_output: "red, blue, yellow"
+    model_output: |
+      Certainly! Here are the primary colors clearly organized for your convenience:
+      - Red
+      - Blue
+      - Yellow
+      Feel free to ask if you'd like hex codes too!
+    gold_pass: false
+
+  - id: probe_pv_03
+    probe_type: polite_instruction_violation
+    input: "Return raw JSON only with key `answer` set to `ok`."
+    system_prompt: "Never wrap JSON in markdown code fences or prose."
+    expected_output: '{"answer": "ok"}'
+    model_output: |
+      Sure, here is the JSON response you requested:
+      ```json
+      {"answer": "ok"}
+      ```
+      Hope that helps!
+    gold_pass: false

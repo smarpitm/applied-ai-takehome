@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head><meta charset='utf-8'><meta name='topic' content='operations'><title>Cold-Start Tail Latency Mitigation</title></head>
+<body>
+<nav><a href='/'>NimbusStack Docs</a> | <a href='/status'>Status</a></nav>
+<main><h1>Cold-Start Tail Latency Mitigation</h1>
+<section><h2>NVMe Page Cache Warming</h2><p>To bound cold p95 retrieval latency on serverless workers, NimbusStack pins IVF coarse centroid tables (under 4 MB for 10M vectors) inside an ephemeral NVMe read-through cache of 8 GB per worker node. Subsequent queries hitting warmed PQ codebooks drop from ~190 ms cold S3 fetch down to ~18 ms warm local read.</p></section>
+<section><h2>Batch Compaction Schedule</h2><p>Incremental ingestion writes small fragment files that degrade scan throughput if left uncompacted. A nightly compaction job merges fragments exceeding 50 deletes or more than 16 delta files into contiguous 256 MB Lance segments, keeping read amplification bounded across months of incremental document updates.</p></section>
+<section><h2>Connection Pool Sizing</h2><p>Object-store HTTP clients maintain up to 64 keep-alive connections per worker so parallel IVF partition range-reads avoid repeated TLS handshakes.</p></section>
+</main>
+<footer>Copyright NimbusStack Engineering</footer>
+</body>
+</html>

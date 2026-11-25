@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head><meta charset='utf-8'><meta name='topic' content='api_reference'><title>Cursor Pagination and Tenant Rate Limits</title></head>
+<body>
+<nav><a href='/'>NimbusStack Docs</a> | <a href='/status'>Status</a></nav>
+<main><h1>Cursor Pagination and Tenant Rate Limits</h1>
+<section><h2>Opaque Cursor Pagination</h2><p>List endpoints return opaque base64url next_cursor tokens with a default page size of 50 items and a hard upper limit of 200 items per request. Offset-based pagination is disabled above 10,000 rows to avoid linear table scan degradation. Cursors expire after 60 minutes and bind to the caller's original filter predicate hash.</p></section>
+<section><h2>Token Bucket Quotas</h2><p>Free-tier tenants receive 30 queries per minute (burst 10) and 50 MB of vector storage. Standard-tier tenants scale to 600 queries per minute with bursting up to 100 concurrent requests via token-bucket limiters. Response headers X-RateLimit-Remaining and X-RateLimit-Reset expose live bucket headroom on every API call.</p></section>
+<section><h2>Payload Compression</h2><p>API responses above 1 KB automatically apply zstd or gzip HTTP content encoding when advertised by Accept-Encoding headers.</p></section>
+</main>
+<footer>Copyright NimbusStack Engineering</footer>
+</body>
+</html>

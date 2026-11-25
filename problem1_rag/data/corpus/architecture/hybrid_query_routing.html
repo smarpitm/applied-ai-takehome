@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head><meta charset='utf-8'><meta name='topic' content='architecture'><title>Hybrid Query Routing and Metadata Filters</title></head>
+<body>
+<nav><a href='/'>NimbusStack Docs</a> | <a href='/status'>Status</a></nav>
+<main><h1>Hybrid Query Routing and Metadata Filters</h1>
+<section><h2>Pre-Filtering vs Post-Filtering</h2><p>NimbusStack pushes metadata predicates such as file_type and source_id directly into the LanceDB columnar scan before scoring vectors. Pushing selective filters down avoids wasted distance computations and prevents top-k starvation when a filter matches fewer than 5% of rows. Post-filtering after global top-k ANN search frequently returns fewer than k chunks or zero matching documents when the requested topic represents a small fraction of the overall index.</p></section>
+<section><h2>No-Context Similarity Gate</h2><p>Before invoking the downstream generation model, the router verifies that at least one retrieved chunk meets the calibrated cosine similarity threshold of 0.665 for BAAI/bge-small-en-v1.5. Queries scoring below threshold terminate early with a structured no-context refusal and incur zero generation tokens. This gate eliminates unsupported hallucinations on out-of-domain questions while cutting wasted LLM spend on irrelevant queries.</p></section>
+<section><h2>Inline Chunk Citation Enforcement</h2><p>Every chunk inserted into the prompt context is labeled with its exact chunk_id token inside square brackets. The system instruction directs the generator to cite only retrieved IDs inline and to reject unsupported claims. Post-generation verification flags any cited identifier absent from the retrieved candidate list.</p></section>
+</main>
+<footer>Copyright NimbusStack Engineering</footer>
+</body>
+</html>

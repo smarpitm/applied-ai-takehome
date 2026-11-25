@@ -1,0 +1,110 @@
+suite_name: padded_verbosity_experiment
+description: 10 controlled pairs where concise_accurate and padded_accurate share the exact same factual core, testing verbosity bias before vs after mitigation.
+pairs:
+  - id: verb_01
+    input: "What is the default chunk overlap recommended alongside 512-token chunks here?"
+    system_prompt: "Answer accurately and concisely without filler."
+    expected_output: "64 tokens."
+    concise_accurate: "64 tokens."
+    padded_accurate: |
+      Thank you so much for asking such an insightful question about document chunking strategies!
+      When designing retrieval-augmented generation pipelines, selecting an appropriate overlap helps preserve semantic continuity across adjacent boundaries.
+      Specifically, alongside a 512-token recursive splitter, the configured default overlap is 64 tokens.
+      In other words, 64 tokens are carried over between neighboring chunks to prevent boundary splitting. I hope this comprehensive explanation is helpful!
+
+  - id: verb_02
+    input: "How many dimensions does BAAI/bge-small-en-v1.5 output?"
+    system_prompt: "Answer accurately and concisely."
+    expected_output: "384 dimensions."
+    concise_accurate: "BAAI/bge-small-en-v1.5 outputs 384 dimensions."
+    padded_accurate: |
+      That is a wonderful question regarding compact embedding architectures!
+      Understanding embedding dimensionality is key to sizing disk-native vector stores effectively.
+      To answer directly: BAAI/bge-small-en-v1.5 produces dense vector representations with exactly 384 dimensions.
+      Because it uses 384 dimensions, it reduces storage requirements substantially compared to larger embeddings. Please let me know if you'd like more details!
+
+  - id: verb_03
+    input: "What happens if zero chunks pass the similarity threshold in the RAG service?"
+    system_prompt: "Answer accurately and concisely."
+    expected_output: "The service returns a clean refusal without calling the LLM."
+    concise_accurate: "It returns a clean no-context refusal without calling the generation LLM."
+    padded_accurate: |
+      I appreciate you asking about this critical reliability guardrail!
+      Preventing unsupported answers is one of the highest priorities in production QA services.
+      When zero retrieved chunks clear the configured similarity threshold, the pipeline short-circuits and returns a clean no-context refusal without calling the generation LLM.
+      To reiterate, no LLM generation call occurs when context fails the threshold, keeping responses safe and cost-effective.
+
+  - id: verb_04
+    input: "What is the purpose of an append-only JSONL audit log in an evaluation pipeline?"
+    system_prompt: "Answer concisely."
+    expected_output: "It preserves every raw prompt, response, token count, and cost for replayability and auditing."
+    concise_accurate: "It preserves every judge prompt, raw response, latency, token count, and cost for replayability."
+    padded_accurate: |
+      What a thoughtful engineering question! Observability and auditability are indispensable when operating automated evaluation infrastructure at scale.
+      An append-only JSONL audit log records every judge prompt, raw model response, latency, input/output token counts, and estimated cost line by line.
+      Having this full trace ensures complete replayability and transparent cost tracking without requiring an external database. Hope that clarifies everything nicely!
+
+  - id: verb_05
+    input: "Why use temperature=0 for LLM-as-Judge calls?"
+    system_prompt: "Answer concisely."
+    expected_output: "To minimize sampling randomness and improve verdict consistency across re-runs."
+    concise_accurate: "To minimize sampling variance and maximize test-retest verdict consistency."
+    padded_accurate: |
+      Thank you for bringing up sampling temperature configuration!
+      Temperature controls the randomness of token selection during autoregressive decoding.
+      Setting temperature=0 minimizes sampling variance and maximizes test-retest verdict consistency across repeated evaluation runs.
+      In summary, deterministic decoding at temperature=0 helps keep automated verdicts reproducible. Let me know if I can clarify anything else!
+
+  - id: verb_06
+    input: "What is the RPO of NimbusStack cross-region replication?"
+    system_prompt: "Answer concisely."
+    expected_output: "15 minutes."
+    concise_accurate: "15 minutes."
+    padded_accurate: |
+      Disaster recovery planning is vital for durable vector infrastructure!
+      Cross-region replication protects against regional outages by copying committed manifests and data fragments asynchronously.
+      Under NimbusStack's cross-region S3 replication policy, the Recovery Point Objective (RPO) is 15 minutes.
+      That means in a regional failover event, at most 15 minutes of recent manifest commits could need replay. Happy to elaborate further!
+
+  - id: verb_07
+    input: "How should a pairwise judge handle a pair whose winner changes when A and B are swapped?"
+    system_prompt: "Answer concisely."
+    expected_output: "Treat the flipped pair as a tie and log the flip rate."
+    concise_accurate: "Record the flipped pair as a tie and count it toward position flip rate."
+    padded_accurate: |
+      Position bias is one of the most well-known pitfalls in LLM-as-Judge systems!
+      When presenting candidate A and candidate B, judges can inadvertently favor whichever option appears first or second.
+      Therefore, when evaluating both (A, B) and (B, A) yields conflicting winners, the pipeline should record that flipped pair as a tie and count it toward the position flip rate.
+      Requiring order-consistent agreement prevents noisy prompt placement from inflating win metrics. Glad to help!
+
+  - id: verb_08
+    input: "How many bits per code does NimbusStack's IVF-PQ setup use?"
+    system_prompt: "Answer concisely."
+    expected_output: "8 bits per code."
+    concise_accurate: "8 bits per code."
+    padded_accurate: |
+      Great question on Product Quantization parameters!
+      Product Quantization splits vectors into subvectors and quantizes each subspace into compact codebook indices.
+      In NimbusStack's configuration, IVF-PQ uses 8 bits per code across 48 subvectors.
+      Using 8 bits per code is a standard sweet spot between compact storage and retrieval fidelity. Thank you for asking!
+
+  - id: verb_09
+    input: "What is the minimum token-bucket rate limit for free-tier tenants?"
+    system_prompt: "Answer concisely."
+    expected_output: "30 queries per minute (burst 10)."
+    concise_accurate: "30 queries per minute with a burst of 10."
+    padded_accurate: |
+      API quota design balances fair multi-tenant sharing with predictable infrastructure spend!
+      For free-tier tenants on NimbusStack, token-bucket limiters enforce a steady allowance of 30 queries per minute with a burst capacity of 10 requests.
+      To restate clearly, free-tier users are capped at 30 queries per minute and burst 10. Please reach out if you need standard-tier limits too!
+
+  - id: verb_10
+    input: "When should human sign-off be required in a hybrid LLM-judge release gate?"
+    system_prompt: "Answer concisely."
+    expected_output: "When confidence intervals overlap, position flip rate exceeds 15%, or safety scores drop."
+    concise_accurate: "Whenever confidence intervals overlap, position flip rate exceeds 15%, or safety scores drop."
+    padded_accurate: |
+      Designing safe release gates requires combining automated efficiency with human judgment!
+      While an automated judge can catch clear regressions quickly, certain borderline or sensitive conditions demand human oversight.
+      Specifically, require human sign-off whenever statistical confidence intervals overlap, position flip rates exceed 15%, or safety scores drop.
+      Following these exact guardrails ensures high confidence before shipping changes to production!
