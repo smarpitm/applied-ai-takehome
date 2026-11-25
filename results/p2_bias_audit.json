@@ -1,0 +1,100 @@
+{
+  "run_id": "7eb06a39",
+  "summary_table": [
+    {
+      "bias": "Position (A/B order)",
+      "mitigation": "Bidirectional AB + BA evaluation; flipped pairs reconciled to tie",
+      "metric_name": "Flip rate / unverified win leaks",
+      "before_value": "3.6%",
+      "after_value": "21.4% raw / 0% unverified wins",
+      "delta_note": "6 flipped pair(s) downgraded to tie"
+    },
+    {
+      "bias": "Verbosity / length",
+      "mitigation": "Conciseness length-penalty anchor + anti-padding instruction",
+      "metric_name": "Padded-over-concise win rate",
+      "before_value": "0.0%",
+      "after_value": "0.0%",
+      "delta_note": "Conciseness: concise=4.1, padded=3.2"
+    },
+    {
+      "bias": "Self-enhancement",
+      "mitigation": "Decoupled cross-family judge vs generator routing",
+      "metric_name": "Candidate A win rate (same vs cross family)",
+      "before_value": "62.5%",
+      "after_value": "62.5%",
+      "delta_note": "Gen family=llama vs judge=gemini-2.5-flash"
+    },
+    {
+      "bias": "Sycophancy / style",
+      "mitigation": "Evidence-first schema (quotes + rationale before score) + factual check",
+      "metric_name": "False-pass rate on wrong polished probes",
+      "before_value": "10.0%",
+      "after_value": "10.0%",
+      "delta_note": "Tested on 10 adversarial wrong probes"
+    },
+    {
+      "bias": "Score clustering",
+      "mitigation": "Concrete 1/3/5 rubric anchors + pairwise tie-breaking",
+      "metric_name": "Pointwise score std-dev",
+      "before_value": "1.795",
+      "after_value": "1.541",
+      "delta_note": "Dist shifted {'1': 7, '2': 2, '3': 0, '4': 0, '5': 19} -> {'1': 5, '2': 1, '3': 0, '4': 2, '5': 20}"
+    }
+  ],
+  "details": {
+    "position": {
+      "baseline_raw_flip_rate": 0.0357,
+      "mitigated_raw_flip_rate": 0.2143,
+      "mitigated_reconciled_wins_from_flips": 0,
+      "flipped_pairs_converted_to_tie": 6,
+      "total_pairs": 28
+    },
+    "verbosity": {
+      "total_pairs": 10,
+      "avg_chars_concise": 53.3,
+      "avg_chars_padded": 438.2,
+      "avg_tokens_concise": 11.6,
+      "avg_tokens_padded": 78.5,
+      "baseline_padded_win_rate": 0.0,
+      "mitigated_padded_win_rate": 0.0,
+      "mitigated_concise_win_rate": 0.4,
+      "mitigated_conciseness_concise": 4.1,
+      "mitigated_conciseness_padded": 3.2
+    },
+    "self_enhancement": {
+      "generator_family": "llama",
+      "same_family_judge_model": "llama-3.3-70b-versatile",
+      "cross_family_judge_model": "gemini-2.5-flash",
+      "cross_family_fallback_model": "qwen2.5:3b",
+      "same_family_win_rate_a": 0.625,
+      "cross_family_win_rate_a": 0.625,
+      "same_family_mean_score_b": 3.1437,
+      "cross_family_mean_score_b": 2.9375
+    },
+    "sycophancy": {
+      "probe_count": 10,
+      "baseline_false_pass_rate": 0.1,
+      "mitigated_false_pass_rate": 0.1
+    },
+    "score_clustering": {
+      "total_cases": 28,
+      "baseline_score_std_dev": 1.7952,
+      "mitigated_score_std_dev": 1.5408,
+      "baseline_distribution": {
+        "1": 7,
+        "2": 2,
+        "3": 0,
+        "4": 0,
+        "5": 19
+      },
+      "mitigated_distribution": {
+        "1": 5,
+        "2": 1,
+        "3": 0,
+        "4": 2,
+        "5": 20
+      }
+    }
+  }
+}

@@ -1,0 +1,49 @@
+{
+  "run_id": "1a720637",
+  "total_cases": 22,
+  "config_a": {
+    "name": "prompt_v1_minimal",
+    "pass_rate": 0.2273,
+    "mean_score": 2.1341,
+    "win_rate": 0.0,
+    "wins": 0,
+    "criterion_means": {
+      "correctness": 2.0,
+      "faithfulness": 2.091,
+      "completeness": 1.955,
+      "instruction_following": 2.045,
+      "conciseness": 2.136,
+      "safety": 3.045
+    }
+  },
+  "config_b": {
+    "name": "prompt_v2_structured_grounded",
+    "pass_rate": 0.6364,
+    "mean_score": 3.9227,
+    "win_rate": 0.5909,
+    "wins": 13,
+    "criterion_means": {
+      "correctness": 3.727,
+      "faithfulness": 3.909,
+      "completeness": 3.818,
+      "instruction_following": 3.955,
+      "conciseness": 4.045,
+      "safety": 4.591
+    }
+  },
+  "ties": 9,
+  "position_flip_rate": 0.3636,
+  "binomial_sign_test_p_value": 0.000244,
+  "bootstrap_95_ci_mean_diff": [
+    1.6295,
+    2.7818
+  ],
+  "declared_winner": "blocked_high_position_flip_rate",
+  "justification": "Position flip rate 36.4% exceeds 15% release-gate limit.",
+  "parse_error_count": 0,
+  "retry_count": 0,
+  "total_judge_tokens": 163517,
+  "total_input_tokens": 105896,
+  "total_output_tokens": 57621,
+  "total_cost_usd": 0.0
+}

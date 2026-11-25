@@ -1,0 +1,60 @@
+{
+  "gold_agreement": {
+    "pointwise_sample_size": 28,
+    "pointwise_agreement_rate": 0.8929,
+    "pointwise_cohens_kappa": 0.7042,
+    "pairwise_sample_size": 28,
+    "pairwise_agreement_rate": 0.7143,
+    "pairwise_cohens_kappa": 0.4286
+  },
+  "adversarial_probes": {
+    "total_probes": 14,
+    "baseline_fooled_count": 1,
+    "baseline_fooled_rate": 0.0714,
+    "mitigated_fooled_count": 1,
+    "mitigated_fooled_rate": 0.0714,
+    "baseline_by_type": {
+      "verbose_but_wrong": {
+        "total": 4,
+        "fooled": 0
+      },
+      "terse_but_correct": {
+        "total": 4,
+        "fooled": 0
+      },
+      "confident_hallucination": {
+        "total": 3,
+        "fooled": 0
+      },
+      "polite_instruction_violation": {
+        "total": 3,
+        "fooled": 1
+      }
+    },
+    "mitigated_by_type": {
+      "verbose_but_wrong": {
+        "total": 4,
+        "fooled": 0
+      },
+      "terse_but_correct": {
+        "total": 4,
+        "fooled": 0
+      },
+      "confident_hallucination": {
+        "total": 3,
+        "fooled": 0
+      },
+      "polite_instruction_violation": {
+        "total": 3,
+        "fooled": 1
+      }
+    }
+  },
+  "test_retest": {
+    "sample_size": 10,
+    "repeats": 3,
+    "temperature": 0.0,
+    "verdict_flips": 2,
+    "test_retest_flip_rate": 0.2
+  }
+}
